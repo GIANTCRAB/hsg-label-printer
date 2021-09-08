@@ -1,0 +1,11 @@
+extends layout
+block content
+    h1 World Best's Printer
+    canvas(id="myCanvas", width="800", height="1200")
+    label(for="pictureToCanvas") Add Picture
+    input(id="pictureToCanvas", type="file")
+    label(for="textInput") Add Text
+    textarea(id="textInput")
+    button(id="updateText") Update Text
+    button(id="submitImage") Submit
+    script(src='/javascripts/index.js')
