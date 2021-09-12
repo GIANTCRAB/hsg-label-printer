@@ -11,7 +11,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/print', function (req, res, next) {
-    const endpoint = 'http://localhost:631/printers/LabelWriter-4XL';
+    const endpoint = 'http://localhost:631/printers/LabelWriter_4XL';
     const printer = ipp.Printer(endpoint);
 
     const imgData = req.body['input-data'];
