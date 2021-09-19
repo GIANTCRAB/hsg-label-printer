@@ -4,16 +4,27 @@ var router = express.Router();
 const ipp = require('ipp');
 const fs = require("fs");
 const jspdf = require("jspdf");
+const multer = require("multer");
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './')
+    },
+    filename: function (req, file, cb) {
+        cb(null, 'download.pdf')
+    },
+});
+const upload = multer({storage: storage});
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
     res.render('index');
 });
 
-router.post('/print', function (req, res, next) {
-    const endpoint = 'http://localhost:631/printers/LabelWriter_4XL';
-    const printer = ipp.Printer(endpoint);
+router.get('/print-pdf', function (req, res, next) {
+    res.render('pdf');
+});
 
+router.post('/print', function (req, res, next) {
     const imgData = req.body['input-data'];
 
     const pdf = new jspdf.jsPDF();
@@ -21,8 +32,24 @@ router.post('/print', function (req, res, next) {
     pdf.addImage({imageData: imgData, x: 0, y: 0, width: 104, height: 159});
     pdf.save("download.pdf");
 
+    printPdf(res);
+});
 
-    fs.readFile("download.pdf", function (err, data) {
+router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
+    const pdfFile = req.file;
+
+    if (pdfFile) {
+        printPdf(res);
+    } else {
+        res.json({error: 'No file given'});
+    }
+});
+
+function printPdf(res, filename = 'download.pdf') {
+    const endpoint = 'http://localhost:631/printers/LabelWriter_4XL';
+    const printer = ipp.Printer(endpoint);
+
+    fs.readFile(filename, function (err, data) {
         const msg = {
             "operation-attributes-tag": {
                 "requesting-user-name": "woohuiren",
@@ -42,7 +69,6 @@ router.post('/print', function (req, res, next) {
             }
         });
     });
-});
-
+}
 
 module.exports = router;

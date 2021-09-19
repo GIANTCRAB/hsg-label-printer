@@ -1,0 +1,7 @@
+extends layout
+block content
+    h1 World Best's Printer
+    label(for="pdfUpload") Select PDF to Upload
+    input(id="pdfUpload", name="pdf-file", type="file")
+    button(id="submitPdf") Submit
+    script(src='/javascripts/pdf.js')
