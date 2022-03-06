@@ -3,5 +3,8 @@ block content
     h1 World Best's Printer
     label(for="pdfUpload") Select PDF to Upload
     input(id="pdfUpload", name="pdf-file", type="file")
+    select(id="printerName")
+        option(value="LabelWriter_4XL") Label printer
+        option(value="DocuPrint_3055_A4_PDF") A4 Black and white printer
     button(id="submitPdf") Submit
     script(src='/javascripts/pdf.js')

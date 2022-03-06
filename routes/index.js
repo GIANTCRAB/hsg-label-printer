@@ -37,16 +37,17 @@ router.post('/print', function (req, res, next) {
 
 router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
     const pdfFile = req.file;
+    const requestedPrinter = req.body['printer-name']; // DocuPrint_3055_A4_PDF or LabelWriter_4XL
 
     if (pdfFile) {
-        printPdf(res);
+        printPdf(res, requestedPrinter);
     } else {
         res.json({error: 'No file given'});
     }
 });
 
-function printPdf(res, filename = 'download.pdf') {
-    const endpoint = 'http://localhost:631/printers/LabelWriter_4XL';
+function printPdf(res, printerName = 'LabelWriter_4XL', filename = 'download.pdf') {
+    const endpoint = 'http://localhost:631/printers/' + printerName;
     const printer = ipp.Printer(endpoint);
 
     fs.readFile(filename, function (err, data) {
