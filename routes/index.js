@@ -4,14 +4,7 @@ const router = express.Router();
 const ipp = require('ipp');
 const fs = require("fs");
 const multer = require("multer");
-const {PDFImage} = require("pdf-lib");
 const PDFDocument = require('pdf-lib').PDFDocument;
-
-const asyncMiddleware = fn =>
-    (req, res, next) => {
-        Promise.resolve(fn(req, res, next))
-            .catch(next);
-    };
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -32,42 +25,46 @@ router.get('/print-pdf', function (req, res, next) {
     res.render('pdf');
 });
 
-router.post('/print', asyncMiddleware(async function (req, res, next) {
+router.post('/print', function (req, res, next) {
     const imgData = req.body['input-data'];
 
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage();
-    const pngImage = await pdfDoc.embedPng(imgData);
-    page.drawImage(pngImage, {
-        x: 0,
-        y: 0,
-        width: 104,
-        height: 159,
-    })
+    PDFDocument.create().then((pdfDoc) => {
+        const page = pdfDoc.addPage();
 
-    const pdfBytes = await pdfDoc.save();
+        pdfDoc.embedPng(imgData).then((pngImage) => {
+            page.drawImage(pngImage, {
+                x: 0,
+                y: 0,
+                width: 104,
+                height: 159,
+            });
+            pdfDoc.save().then((pdfBytes) => {
+                printPdf(res, 'LabelWriter_4XL', pdfBytes);
+            });
+        });
+    });
+});
 
-    await printPdf(res, 'LabelWriter_4XL', pdfBytes);
-}));
-
-router.post('/print-pdf', upload.single('pdf-file'), asyncMiddleware(async function (req, res, next) {
+router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
     const pdfFile = req.file;
     const requestedPrinter = req.body['printer-name']; // DocuPrint_3055_A4_PDF or LabelWriter_4XL
 
     if (pdfFile) {
         const rawData = new Uint8Array(fs.readFileSync('download.pdf'));
-        const pdfDoc = await PDFDocument.create();
-        await pdfDoc.embedPdf(rawData);
 
-        const pdfBytes = await pdfDoc.save();
-
-        await printPdf(res, requestedPrinter, pdfBytes);
+        PDFDocument.create().then((pdfDoc) => {
+            pdfDoc.embedPdf(rawData).then(() => {
+                pdfDoc.save().then(pdfBytes => {
+                    printPdf(res, requestedPrinter, pdfBytes);
+                });
+            });
+        });
     } else {
         res.json({error: 'No file given'});
     }
-}));
+});
 
-async function printPdf(res, printerName, fileBytes) {
+function printPdf(res, printerName, fileBytes) {
     const endpoint = 'http://localhost:631/printers/' + printerName;
     const printer = ipp.Printer(endpoint, {});
 
