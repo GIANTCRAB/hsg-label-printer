@@ -35,6 +35,8 @@ router.post('/print', function (req, res, next) {
             page.drawImage(pngImage, {
                 x: 0,
                 y: 0,
+                width: page.getWidth(),
+                height: page.getHeight(),
             });
             pdfDoc.save().then((pdfBytes) => {
                 printPdf(res, 'LabelWriter_4XL', pdfBytes);
