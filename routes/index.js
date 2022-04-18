@@ -32,6 +32,7 @@ router.post('/print', function (req, res, next) {
         const page = pdfDoc.addPage([104, 159]);
 
         pdfDoc.embedPng(imgData).then((pngImage) => {
+            pngImage.scaleToFit(page.getWidth(), page.getHeight());
             page.drawImage(pngImage, {
                 x: 0,
                 y: 0,
