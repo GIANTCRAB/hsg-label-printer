@@ -3,8 +3,9 @@ var router = express.Router();
 
 const ipp = require('ipp');
 const fs = require("fs");
-const jspdf = require("jspdf");
 const multer = require("multer");
+import {PDFDocument} from 'pdf-lib';
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './')
@@ -24,52 +25,61 @@ router.get('/print-pdf', function (req, res, next) {
     res.render('pdf');
 });
 
-router.post('/print', function (req, res, next) {
+router.post('/print', async function (req, res, next) {
     const imgData = req.body['input-data'];
 
-    const pdf = new jspdf.jsPDF();
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage();
+    page.drawImage(imgData, {
+        x: 0,
+        y: 0,
+        width: 104,
+        height: 159,
+    })
 
-    pdf.addImage({imageData: imgData, x: 0, y: 0, width: 104, height: 159});
-    pdf.save("download.pdf");
+    const pdfBytes = await pdfDoc.save();
 
-    printPdf(res);
+    await printPdf(res, 'LabelWriter_4XL', pdfBytes);
 });
 
-router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
+router.post('/print-pdf', upload.single('pdf-file'), async function (req, res, next) {
     const pdfFile = req.file;
     const requestedPrinter = req.body['printer-name']; // DocuPrint_3055_A4_PDF or LabelWriter_4XL
 
     if (pdfFile) {
-        printPdf(res, requestedPrinter);
+        const rawData = new Uint8Array(fs.readFileSync('download.pdf'));
+        const pdfDoc = await PDFDocument.create();
+        await pdfDoc.embedPdf(rawData);
+
+        const pdfBytes = await pdfDoc.save();
+
+        await printPdf(res, requestedPrinter, pdfBytes);
     } else {
         res.json({error: 'No file given'});
     }
 });
 
-function printPdf(res, printerName = 'LabelWriter_4XL', filename = 'download.pdf') {
+async function printPdf(res, printerName, fileBytes) {
     const endpoint = 'http://localhost:631/printers/' + printerName;
-    const printer = ipp.Printer(endpoint);
+    const printer = ipp.Printer(endpoint, {});
 
-    fs.readFile(filename, function (err, data) {
-        const msg = {
-            "operation-attributes-tag": {
-                "requesting-user-name": "woohuiren",
-                "document-format": "application/pdf"
-            },
-            "job-attributes-tag": {
-                "sides": "one-sided",
-                "media": "iso_a4_210x297mm"
-            },
-            data: data
-        };
+    const msg = {
+        "operation-attributes-tag": {
+            "requesting-user-name": "woohuiren",
+            "document-format": "application/pdf"
+        },
+        "job-attributes-tag": {
+            "sides": "one-sided"
+        },
+        data: fileBytes
+    };
 
-        printer.execute("Print-Job", msg, function (err, printerRes) {
-            if (err) {
-                res.json({error: err});
-            } else {
-                res.json({message: printerRes});
-            }
-        });
+    printer.execute("Print-Job", msg, function (err, printerRes) {
+        if (err) {
+            res.json({error: err});
+        } else {
+            res.json({message: printerRes});
+        }
     });
 }
 
