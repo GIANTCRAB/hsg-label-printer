@@ -1,10 +1,12 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
 const ipp = require('ipp');
 const fs = require("fs");
 const multer = require("multer");
 import {PDFDocument} from 'pdf-lib';
+
+import {asyncMiddleware} from "../middlewares/asyncMiddleware";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -25,7 +27,7 @@ router.get('/print-pdf', function (req, res, next) {
     res.render('pdf');
 });
 
-router.post('/print', async function (req, res, next) {
+router.post('/print', asyncMiddleware(async function (req, res, next) {
     const imgData = req.body['input-data'];
 
     const pdfDoc = await PDFDocument.create();
@@ -40,9 +42,9 @@ router.post('/print', async function (req, res, next) {
     const pdfBytes = await pdfDoc.save();
 
     await printPdf(res, 'LabelWriter_4XL', pdfBytes);
-});
+}));
 
-router.post('/print-pdf', upload.single('pdf-file'), async function (req, res, next) {
+router.post('/print-pdf', upload.single('pdf-file'), asyncMiddleware(async function (req, res, next) {
     const pdfFile = req.file;
     const requestedPrinter = req.body['printer-name']; // DocuPrint_3055_A4_PDF or LabelWriter_4XL
 
@@ -57,7 +59,7 @@ router.post('/print-pdf', upload.single('pdf-file'), async function (req, res, n
     } else {
         res.json({error: 'No file given'});
     }
-});
+}));
 
 async function printPdf(res, printerName, fileBytes) {
     const endpoint = 'http://localhost:631/printers/' + printerName;
