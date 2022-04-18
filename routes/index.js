@@ -4,9 +4,13 @@ const router = express.Router();
 const ipp = require('ipp');
 const fs = require("fs");
 const multer = require("multer");
-import {PDFDocument} from 'pdf-lib';
+const PDFDocument = require('pdf-lib').PDFDocument;
 
-import {asyncMiddleware} from "../middlewares/asyncMiddleware";
+const asyncMiddleware = fn =>
+    (req, res, next) => {
+        Promise.resolve(fn(req, res, next))
+            .catch(next);
+    };
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
