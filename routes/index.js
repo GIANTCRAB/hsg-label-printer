@@ -4,6 +4,7 @@ const router = express.Router();
 const ipp = require('ipp');
 const fs = require("fs");
 const multer = require("multer");
+const {PDFImage} = require("pdf-lib");
 const PDFDocument = require('pdf-lib').PDFDocument;
 
 const asyncMiddleware = fn =>
@@ -36,7 +37,8 @@ router.post('/print', asyncMiddleware(async function (req, res, next) {
 
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage();
-    page.drawImage(imgData, {
+    const pngImage = await pdfDoc.embedPng(imgData);
+    page.drawImage(pngImage, {
         x: 0,
         y: 0,
         width: 104,
