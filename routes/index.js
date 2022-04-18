@@ -76,6 +76,11 @@ router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
     }
 });
 
+/**
+ * @param {Response<*, Record<string, *>>} res
+ * @param {string|{max, type: string}} printerName
+ * @param {Uint8Array} fileBytes
+ */
 function printPdf(res, printerName, fileBytes) {
     const endpoint = 'http://localhost:631/printers/' + printerName;
     const printer = ipp.Printer(endpoint, {});
@@ -88,7 +93,7 @@ function printPdf(res, printerName, fileBytes) {
         "job-attributes-tag": {
             "sides": "one-sided"
         },
-        data: fileBytes.buffer
+        data: new Buffer.from(fileBytes)
     };
 
     printer.execute("Print-Job", msg, function (err, printerRes) {
