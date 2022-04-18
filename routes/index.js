@@ -35,8 +35,8 @@ router.post('/print', function (req, res, next) {
             page.drawImage(pngImage, {
                 x: 0,
                 y: 0,
-                width: 104,
-                height: 159,
+                width: page.getWidth(),
+                height: page.getHeight(),
             });
             pdfDoc.save().then((pdfBytes) => {
                 printPdf(res, 'LabelWriter_4XL', pdfBytes);
@@ -56,20 +56,14 @@ router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
     const requestedPrinter = req.body['printer-name']; // DocuPrint_3055_A4_PDF or LabelWriter_4XL
 
     if (pdfFile) {
-        const rawData = new Uint8Array(fs.readFileSync('download.pdf'));
-
-        PDFDocument.create().then((pdfDoc) => {
-            pdfDoc.embedPdf(rawData).then(() => {
-                pdfDoc.save().then(pdfBytes => {
-                    printPdf(res, requestedPrinter, pdfBytes);
-                }).catch(error => {
-                    res.json({error: 'Save issue', fullMessage: error.toString()});
-                });
+        PDFDocument.load('download.pdf').then((pdfDoc) => {
+            pdfDoc.save().then(pdfBytes => {
+                printPdf(res, requestedPrinter, pdfBytes);
             }).catch(error => {
-                res.json({error: 'Embed pdf issue', fullMessage: error.toString()});
+                res.json({error: 'Save issue', fullMessage: error.toString()});
             });
         }).catch(error => {
-            res.json({error: 'PDF issue', fullMessage: error.toString()});
+            res.json({error: 'Loading pdf issue', fullMessage: error.toString()});
         });
     } else {
         res.json({error: 'No file given'});
