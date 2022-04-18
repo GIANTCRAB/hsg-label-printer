@@ -40,8 +40,14 @@ router.post('/print', function (req, res, next) {
             });
             pdfDoc.save().then((pdfBytes) => {
                 printPdf(res, 'LabelWriter_4XL', pdfBytes);
+            }, error => {
+                res.json({error: 'Save issue', fullMessage: error.toString()});
             });
+        }, error => {
+            res.json({error: 'Embed image issue', fullMessage: error.toString()});
         });
+    }, error => {
+        res.json({error: 'PDF issue', fullMessage: error.toString()});
     });
 });
 
@@ -56,8 +62,14 @@ router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
             pdfDoc.embedPdf(rawData).then(() => {
                 pdfDoc.save().then(pdfBytes => {
                     printPdf(res, requestedPrinter, pdfBytes);
+                }, error => {
+                    res.json({error: 'Save issue', fullMessage: error.toString()});
                 });
+            }, error => {
+                res.json({error: 'Embed pdf issue', fullMessage: error.toString()});
             });
+        }, error => {
+            res.json({error: 'PDF issue', fullMessage: error.toString()});
         });
     } else {
         res.json({error: 'No file given'});
