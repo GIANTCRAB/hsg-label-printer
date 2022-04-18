@@ -29,14 +29,14 @@ router.post('/print', function (req, res, next) {
     const imgData = req.body['input-data'];
 
     PDFDocument.create().then((pdfDoc) => {
-        const page = pdfDoc.addPage([104, 159]);
+        const page = pdfDoc.addPage([295, 452]);
 
         pdfDoc.embedPng(imgData).then((pngImage) => {
             page.drawImage(pngImage, {
                 x: 0,
                 y: 0,
-                width: 393,
-                height: 600,
+                width: 295,
+                height: 452,
             });
             pdfDoc.save().then((pdfBytes) => {
                 printPdf(res, 'LabelWriter_4XL', pdfBytes);
