@@ -56,7 +56,8 @@ router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
     const requestedPrinter = req.body['printer-name']; // DocuPrint_3055_A4_PDF or LabelWriter_4XL
 
     if (pdfFile) {
-        PDFDocument.load('download.pdf').then((pdfDoc) => {
+        const rawData = new Uint8Array(fs.readFileSync('download.pdf'));
+        PDFDocument.load(rawData).then((pdfDoc) => {
             pdfDoc.save().then(pdfBytes => {
                 printPdf(res, requestedPrinter, pdfBytes);
             }).catch(error => {
