@@ -58,6 +58,7 @@ function printPdf(res, printerName = 'LabelWriter_4XL', filename = 'download.pdf
             },
             "job-attributes-tag": {
                 "sides": "one-sided",
+                "media": "iso_a4_210x297mm"
             },
             data: data
         };
