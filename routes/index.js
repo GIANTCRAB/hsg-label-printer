@@ -88,7 +88,7 @@ function printPdf(res, printerName, fileBytes) {
         "job-attributes-tag": {
             "sides": "one-sided"
         },
-        data: fileBytes
+        data: fileBytes.buffer
     };
 
     printer.execute("Print-Job", msg, function (err, printerRes) {
