@@ -29,7 +29,7 @@ router.post('/print', function (req, res, next) {
     const imgData = req.body['input-data'];
 
     PDFDocument.create().then((pdfDoc) => {
-        const page = pdfDoc.addPage();
+        const page = pdfDoc.addPage([104, 159]);
 
         pdfDoc.embedPng(imgData).then((pngImage) => {
             page.drawImage(pngImage, {
