@@ -35,8 +35,8 @@ router.post('/print', function (req, res, next) {
             page.drawImage(pngImage, {
                 x: 0,
                 y: 0,
-                width: page.getWidth(),
-                height: page.getHeight(),
+                width: pngImage.width,
+                height: pngImage.height,
             });
             pdfDoc.save().then((pdfBytes) => {
                 printPdf(res, 'LabelWriter_4XL', pdfBytes);
@@ -56,7 +56,7 @@ router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
     const requestedPrinter = req.body['printer-name']; // DocuPrint_3055_A4_PDF or LabelWriter_4XL
 
     if (pdfFile) {
-        const rawData = fs.readFileSync('download.pdf');
+        const rawData = new Uint8Array(fs.readFileSync('download.pdf'));
         PDFDocument.load(rawData).then((pdfDoc) => {
             pdfDoc.save().then(pdfBytes => {
                 printPdf(res, requestedPrinter, pdfBytes);
