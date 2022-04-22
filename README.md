@@ -28,3 +28,7 @@ npm start
 ```
 
 now server runs on port 3000
+
+## License
+
+This software is licensed under AGPLv3. More details can be found in the [LICENSE file](LICENSE.md).
