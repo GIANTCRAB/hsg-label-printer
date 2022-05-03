@@ -21,7 +21,7 @@
 /**
  * Module dependencies.
  */
-require('dotenv').config();
+require('dotenv').config({ path: '.env' });
 
 var app = require('../app');
 var debug = require('debug')('label-printer:server');
