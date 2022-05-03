@@ -24,3 +24,13 @@ body {
 a {
   color: #00B7FF;
 }
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.grid-col {
+  margin: 0;
+  padding: 0;
+}
