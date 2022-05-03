@@ -14,32 +14,34 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-document.getElementById("submitPdf")
-    .addEventListener("click", function () {
-        const file = document.getElementById("pdfUpload").files[0];
-        const printerOptions = document.getElementById("printerName");
-        const requestedPrinter = printerOptions.options[printerOptions.selectedIndex].value;
-        if (window.XMLHttpRequest && file) {
+document.addEventListener("DOMContentLoaded", function () {
 
-            httpRequest = new XMLHttpRequest();
+    document.getElementById("submitPdf")
+        .addEventListener("click", function () {
+            const file = document.getElementById("pdfUpload").files[0];
+            const printerOptions = document.getElementById("printerName");
+            const requestedPrinter = printerOptions.options[printerOptions.selectedIndex].value;
+            if (window.XMLHttpRequest && file) {
 
-            httpRequest.onreadystatechange = alertContents;
-            httpRequest.open('POST', '/print-pdf', true);
-            httpRequest.setRequestHeader('Accept', 'application/json');
-            const formData = new FormData();
-            formData.append("pdf-file", file);
-            formData.append("printer-name", requestedPrinter);
-            httpRequest.send(formData);
-        }
-    });
+                httpRequest = new XMLHttpRequest();
 
+                httpRequest.onreadystatechange = alertContents;
+                httpRequest.open('POST', '/print-pdf', true);
+                httpRequest.setRequestHeader('Accept', 'application/json');
+                const formData = new FormData();
+                formData.append("pdf-file", file);
+                formData.append("printer-name", requestedPrinter);
+                httpRequest.send(formData);
+            }
+        });
 
-function alertContents() {
-    if (httpRequest.readyState === XMLHttpRequest.DONE) {
-        if (httpRequest.status === 200) {
-            alert(httpRequest.responseText);
-        } else {
-            alert('There was a problem with the request.');
+    function alertContents() {
+        if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            if (httpRequest.status === 200) {
+                alert(httpRequest.responseText);
+            } else {
+                alert('There was a problem with the request.');
+            }
         }
     }
-}
+});
