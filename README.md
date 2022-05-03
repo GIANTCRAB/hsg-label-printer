@@ -1,13 +1,15 @@
-# HSG Label Printer
+# HSG Printer
 
-## Label printer
-You need the drivers!
+## Configuration
+Get the necessary drivers for the listed printers. Thereafter, set up the printers in CUPs. 
+
+You can configure where this web service runs using `.env`. A sample env file has been provided in `.env.sample`. Copy it as `.env`.
+
+A handy systemd file `node-printer.service` has also been provided. You can copy it into systemd services using `sudo cp node-printer.service /etc/systemd/system/`. 
+
+## DYMO Label printer
 
 * `sudo apt-get install dymo-cups-drivers`
-* configure printer:
-* Select from Database
-* -> DYMO
-* ---> LabelWriter 4XL
 
 ## Xerox Printer
 
