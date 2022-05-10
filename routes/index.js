@@ -20,11 +20,12 @@ const router = express.Router();
 const ipp = require('ipp');
 const fs = require("fs");
 const multer = require("multer");
+const path = require("path");
 const PDFDocument = require('pdf-lib').PDFDocument;
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './')
+        cb(null, path.join(__dirname, '../'))
     },
     filename: function (req, file, cb) {
         cb(null, 'download.pdf')
@@ -72,7 +73,7 @@ router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
     const requestedPrinter = req.body['printer-name']; // DocuPrint_3055_A4_PDF or LabelWriter_4XL
 
     if (pdfFile) {
-        const rawData = new Uint8Array(fs.readFileSync('download.pdf'));
+        const rawData = new Uint8Array(fs.readFileSync(path.join(__dirname, '../', 'download.pdf')));
         PDFDocument.load(rawData).then((pdfDoc) => {
             pdfDoc.save().then(pdfBytes => {
                 printPdf(res, requestedPrinter, pdfBytes);
