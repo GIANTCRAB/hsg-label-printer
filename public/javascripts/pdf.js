@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (httpRequest.status === 200) {
                 alert(httpRequest.responseText);
             } else {
-                alert('There was a problem with the request.');
+                alert('There was a problem with the request. Error code: ' + httpRequest.status);
             }
         }
     }
