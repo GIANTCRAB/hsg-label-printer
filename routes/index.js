@@ -33,6 +33,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({storage: storage});
 
+const availablePrinters = ['LabelWriter_4XL', 'DocuPrint_3055_A4_PDF', 'EPSON_L455_Series'];
+
 /* GET home page. */
 router.get('/', function (req, res, next) {
     res.render('index');
@@ -74,7 +76,25 @@ router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
 
     if (pdfFile) {
         const rawData = new Uint8Array(fs.readFileSync(path.join(__dirname, '../', 'download.pdf')));
-        printPdf(res, requestedPrinter, rawData);
+        if (requestedPrinter === 'LabelWriter_4XL') {
+            PDFDocument.create().then((pdfDoc) => {
+                const page = pdfDoc.addPage([295, 452]);
+                pdfDoc.embedPdf(rawData).then((pdfPages) => {
+                    page.drawPage(pdfPages[0]);
+                    pdfDoc.save().then((pdfBytes) => {
+                        printPdf(res, requestedPrinter, pdfBytes);
+                    }).catch(error => {
+                        res.json({error: 'Save issue', fullMessage: error.toString()});
+                    });
+                }).catch(error => {
+                    res.json({error: 'Embed PDF issue', fullMessage: error.toString()});
+                });
+            }).catch(error => {
+                res.json({error: 'PDF issue', fullMessage: error.toString()});
+            });
+        } else {
+            printPdf(res, requestedPrinter, rawData);
+        }
     } else {
         res.json({error: 'No file given'});
     }
