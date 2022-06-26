@@ -74,15 +74,7 @@ router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
 
     if (pdfFile) {
         const rawData = new Uint8Array(fs.readFileSync(path.join(__dirname, '../', 'download.pdf')));
-        PDFDocument.load(rawData).then((pdfDoc) => {
-            pdfDoc.save().then(pdfBytes => {
-                printPdf(res, requestedPrinter, pdfBytes);
-            }).catch(error => {
-                res.json({error: 'Save issue', fullMessage: error.toString()});
-            });
-        }).catch(error => {
-            res.json({error: 'Loading pdf issue', fullMessage: error.toString()});
-        });
+        printPdf(res, requestedPrinter, rawData);
     } else {
         res.json({error: 'No file given'});
     }
