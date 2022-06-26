@@ -84,7 +84,8 @@ router.post('/print-pdf', upload.single('pdf-file'), function (req, res, next) {
                 pdfDoc.embedPdf(rawData).then((pdfPages) => {
                     const firstPage = pdfPages[0];
                     const scaleWidth = LABEL_WIDTH / firstPage.width;
-                    page.drawPage(pdfPages[0], {xScale: scaleWidth});
+                    const scaleHeight = LABEL_HEIGHT / firstPage.height;
+                    page.drawPage(pdfPages[0], {xScale: scaleWidth, yScale: scaleHeight});
                     pdfDoc.save().then((pdfBytes) => {
                         printPdf(res, requestedPrinter, pdfBytes);
                     }).catch(error => {
