@@ -15,6 +15,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 extends layout
 block content
-  h1= message
-  h2= error.status
-  pre #{error.stack}
+    .error-page
+        .error-code= error.status
+        .error-message= message
+        if error.stack
+            pre.error-stack #{error.stack}
+        a.btn.btn-primary(href="/")
+            svg(xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+                line(x1="19" y1="12" x2="5" y2="12")
+                polyline(points="12 19 5 12 12 5")
+            | Back to Home

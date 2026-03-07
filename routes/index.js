@@ -39,11 +39,11 @@ const LABEL_HEIGHT = 452;
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-    res.render('index');
+    res.render('index', {currentPage: 'label'});
 });
 
 router.get('/print-pdf', function (req, res, next) {
-    res.render('pdf');
+    res.render('pdf', {currentPage: 'pdf'});
 });
 
 router.post('/print', function (req, res, next) {
